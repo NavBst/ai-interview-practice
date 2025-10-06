@@ -27,20 +27,30 @@ export default function Home() {
       </section>
       <section className="flex flex-col gap-6 mt-8">
         <h2>Your Interviews</h2>
-        <div className="interview-section">
-          <p>
-            You haven&apos;t any interview yet. Create your first interview to
-            get started.
-          </p>
+       
+        <div className="interviews-section">
+          
           {dummyInterviews.map((interview) => (
             <InteviewCard key={interview.id} {...interview} />
           ))}
+           {/* <p>
+            You haven&apos;t any interview yet. Create your first interview to
+            get started.
+          </p> */}
         </div>
       </section>
       <section className="flex flex-col gap-6 mt-8">
         <h2>Take an Interview</h2>
-        <div className="interview-section">
-          <p>There are no intviews available.</p>
+        <div className="interviews-section">
+           {
+           dummyInterviews ?
+           dummyInterviews.map((interview) => (
+            <InteviewCard key={interview.id} {...interview} />
+          ))
+        :
+            <p>There are no intviews available.</p> 
+        }
+     
         </div>
       </section>
     </>

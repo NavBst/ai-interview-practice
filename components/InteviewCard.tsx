@@ -4,7 +4,9 @@ import Image from "next/image";
 import React from "react";
 import { Button } from "./ui/button";
 import Link from "next/link";
-interface InteviewCardProps {}
+import DisplayTechIcons from "./DisplayTechIcons";
+import { Feedback, InterviewCardProps } from "@/types";
+// interface InteviewCardProps {}
 const InteviewCard = ({
   interviewId,
   userId,
@@ -56,9 +58,9 @@ const InteviewCard = ({
           </p>
         </div>
         <div className="flex flex-row justify-between">
-          <p>Tech Icon</p>
+          <DisplayTechIcons techStack={techstack}/>
           <Button className="btn-primary">
-              <Link href={feedback ? `/inteview/${interviewId}/feedback` : `/inteview/${interviewId}`}>{feedback ? 'Check Feedback' : 'View'}</Link>
+              <Link href={feedback ? `/inteview/${interviewId}/feedback` : `/inteview/${interviewId}`}>{feedback ? 'Check Feedback' : 'View Inteview'}</Link>
             </Button>
 
         </div>
