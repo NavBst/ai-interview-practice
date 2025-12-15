@@ -3,7 +3,7 @@ import { auth, db } from "@/firebase/admin";
 import { SignInParams, SignUpParams, User } from "@/types";
 import { cookies } from "next/headers";
 
-const ONE_WEEK = 60 * 60 * 24 * 7;
+const ONE_WEEK: number= 60 * 60 * 24 * 7;
 
 export async function signUp(params: SignUpParams) {
   const { uid, name, email } = params;
@@ -25,7 +25,7 @@ export async function signUp(params: SignUpParams) {
       message: "User created successfully",
     };
   } catch (e: any) {
-    console.log("Error creating user", e);
+    console.log("Error creating user");
     if (e.code === "auth/email-already-exits") {
       return {
         success: false,
@@ -87,6 +87,7 @@ export async function getCurrentUser(): Promise<User | null> {
       id: user.id,
     } as User;
   } catch (e) {
+    // cookieStore.delete("session");
     console.error("Error verifying session cookie:", e);
     return null;
   }
