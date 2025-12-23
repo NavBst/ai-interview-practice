@@ -57,7 +57,6 @@ export async function getInterviewById(id: string): Promise<Interview | null> {
 
 export async function createFeedback(params: CreateFeedbackParams) {
   const { interviewId, userId, transcript } = params;
-  console.log(transcript);
   try {
     const formattedTranscript = transcript
       .map(
@@ -67,7 +66,13 @@ export async function createFeedback(params: CreateFeedbackParams) {
       .join("");
 
     const {
-      object: { totalScore, categoryScores, finalAssessment },
+      object: {
+        totalScore,
+        categoryScores,
+        strengths,
+        areasForImprovement,
+        finalAssessment,
+      },
     } = await generateObject({
       model: google("gemini-2.5-flash"),
       schema: feedbackSchema,
@@ -92,6 +97,8 @@ export async function createFeedback(params: CreateFeedbackParams) {
       userId,
       totalScore,
       categoryScores,
+      strengths,
+      areasForImprovement,
       finalAssessment,
       createdAt: new Date().toISOString(),
     });

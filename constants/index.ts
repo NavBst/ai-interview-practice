@@ -165,6 +165,8 @@ export const feedbackSchema = z.object({
     .string()
     .describe("A newline-separated list of areas for improvement."),
   finalAssessment: z.string(),
+  strengths: z.string(),
+ 
 });
 
 export const interviewCovers = [

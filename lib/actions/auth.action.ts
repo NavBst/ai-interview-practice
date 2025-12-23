@@ -87,7 +87,7 @@ export async function getCurrentUser(): Promise<User | null> {
       id: user.id,
     } as User;
   } catch (e) {
-    // cookieStore.delete("session");
+    cookieStore.delete("session");
     console.error("Error verifying session cookie:", e);
     return null;
   }

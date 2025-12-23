@@ -7,7 +7,7 @@ interface Feedback {
     score: number;
     comment: string;
   }>;
-  strengths: string[];
+  strengths: string;
   areasForImprovement: string[];
   finalAssessment: string;
   createdAt: string;
