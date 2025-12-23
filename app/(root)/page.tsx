@@ -1,10 +1,20 @@
 import InteviewCard from "@/components/InteviewCard";
 import { Button } from "@/components/ui/button";
 import { dummyInterviews } from "@/constants";
+import { getCurrentUser, getInterviewsByUserId, getLatestInterviews } from "@/lib/actions/auth.action";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Home() {
+export default async function Home() {
+  const user = await getCurrentUser();
+
+  const [userInterveiws, latestInterviews ] = await Promise.all([
+    await getInterviewsByUserId(user?.id || "") ,
+    await getLatestInterviews({userId: String(user?.id)})]);
+
+  const hasPastInterviews = userInterveiws?.length > 0;
+  const hasUpcomingInterviews = latestInterviews?.length > 0;
+
   return (
     <>
       <section className="card-cta">
@@ -30,27 +40,25 @@ export default function Home() {
        
         <div className="interviews-section">
           
-          {dummyInterviews.map((interview) => (
-            <InteviewCard key={interview.id} {...interview} />
-          ))}
-           {/* <p>
-            You haven&apos;t any interview yet. Create your first interview to
-            get started.
-          </p> */}
+          {hasPastInterviews ? (
+            userInterveiws?.map((interview)=>(<InteviewCard key={interview.id} {...interview} />))
+          ) :
+          
+          (<p>You haven't taken any interviews yet.</p>)}
         </div>
       </section>
       <section className="flex flex-col gap-6 mt-8">
         <h2>Take an Interview</h2>
         <div className="interviews-section">
-           {
-           dummyInterviews ?
-           dummyInterviews.map((interview) => (
-            <InteviewCard key={interview.id} {...interview} />
-          ))
-        :
-            <p>There are no intviews available.</p> 
-        }
-     
+           
+            {
+            hasUpcomingInterviews ? (
+            latestInterviews?.map((interview)=>(<InteviewCard key={interview.id} {...interview} />))
+          ) :
+          
+          (<p>There are no new inteviews available</p>)
+          }
+        
         </div>
       </section>
     </>
