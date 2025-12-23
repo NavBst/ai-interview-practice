@@ -2,10 +2,10 @@ import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/actions/auth.action";
 import { getFeedbackByInterviewId, getInterviewById } from "@/lib/actions/general.action";
 import { RouteParams } from "@/types";
+import dayjs from "dayjs";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import React from "react";
 
 const page = async ({params}: RouteParams) => {
   const {id} = await params;

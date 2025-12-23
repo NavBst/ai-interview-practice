@@ -36,18 +36,16 @@ const Agent = ({
   useEffect(() => {
     const onCallStart = () => setCallStatus(CallStatus.ACTIVE);
     const onCallEnd = () => setCallStatus(CallStatus.FINISHED);
-
     const onMessage = (message: Message) => {
       if (message.type === "transcript" && message.transcriptType === "final") {
         const newMessage = { role: message.role, content: message.transcript };
         setMessages((prev) => [...prev, newMessage]);
       }
     };
-
     const onSpeechStart = () => setIsSpeaking(true);
     const onSpeechEnd = () => setIsSpeaking(false);
+    const onError = (error: Error) => console.log('Error', error);
 
-    const onError = (error: Error) => console.log(error);
     vapi.on("call-start", onCallStart);
     vapi.on("call-end", onCallEnd);
     vapi.on("message", onMessage);
@@ -84,34 +82,34 @@ const Agent = ({
 
   useEffect(() => {
     if (callStatus === CallStatus.FINISHED) {
+      console.log(type);
       if (type === "generate") {
         router.push("/");
       } else {
         handleGenerateFeedback(messages);
       }
     }
-    if (callStatus === CallStatus.FINISHED) router.push("/");
   }, [messages, callStatus, type, userId]);
 
   const handleCall = async () => {
     setCallStatus(CallStatus.CONNECTING);
     console.log(userId, userName);
     if (type === "generate") {
-      await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID, {
+      await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
         variableValues: {
           username: userName,
           userid: userId,
         },
       });
     } else {
-      let formmattedQuestions = '';
+      let formattedQuestions = '';
       if(questions){
-        formmattedQuestions = questions.map((question) => `-${question}`).join('\n');
+        formattedQuestions = questions.map((question) => `-${question}`).join('\n');
       }
       await vapi.start(interviewer, 
         {
           variableValues: {
-            questions: formmattedQuestions
+            questions: formattedQuestions
           },
         }
       )

@@ -11,6 +11,7 @@ import { redirect } from "next/navigation";
 const Page = async ({ params }: RouteParams) => {
   console.log("first")
   const { id } = await params;
+  console.log(id);
   const user = await getCurrentUser();
   const interview = await getInterviewById(id);
   if (!interview) redirect("/");
@@ -37,7 +38,8 @@ const Page = async ({ params }: RouteParams) => {
       <Agent
         userName={user?.name || ""}
         userId={user?.id}
-        type={interview.type}
+        interviewId={id}
+        type="interview"
         questions={interview.questions}
       ></Agent>
     </>
