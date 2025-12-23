@@ -1,7 +1,8 @@
 import InteviewCard from "@/components/InteviewCard";
 import { Button } from "@/components/ui/button";
 import { dummyInterviews } from "@/constants";
-import { getCurrentUser, getInterviewsByUserId, getLatestInterviews } from "@/lib/actions/auth.action";
+import { getCurrentUser } from "@/lib/actions/auth.action";
+import { getInterviewsByUserId, getLatestInterviews } from "@/lib/actions/general.action";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -56,7 +57,7 @@ export default async function Home() {
             latestInterviews?.map((interview)=>(<InteviewCard key={interview.id} {...interview} />))
           ) :
           
-          (<p>There are no new inteviews available</p>)
+          (<p>There are no new interviews available</p>)
           }
         
         </div>

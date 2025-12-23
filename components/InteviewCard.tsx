@@ -8,7 +8,7 @@ import DisplayTechIcons from "./DisplayTechIcons";
 import { Feedback, InterviewCardProps } from "@/types";
 // interface InteviewCardProps {}
 const InteviewCard = ({
-  interviewId,
+  id,
   userId,
   role,
   type,
@@ -60,7 +60,7 @@ const InteviewCard = ({
         <div className="flex flex-row justify-between">
           <DisplayTechIcons techStack={techstack}/>
           <Button className="btn-primary">
-              <Link href={feedback ? `/inteview/${interviewId}/feedback` : `/inteview/${interviewId}`}>{feedback ? 'Check Feedback' : 'View Inteview'}</Link>
+              <Link href={feedback ? `/interview/${id}/feedback` : `/interview/${id}`}>{feedback ? 'Check Feedback' : 'View Inteview'}</Link>
             </Button>
 
         </div>

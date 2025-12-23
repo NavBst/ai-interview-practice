@@ -63,7 +63,7 @@ export async function signIn(params: SignInParams) {
 export async function setSessionCookie(idToken: string) {
   const cookieStore = await cookies();
   const sessionCookie = await auth.createSessionCookie(idToken, {
-    expiresIn: ONE_WEEK,
+    expiresIn: ONE_WEEK * 1000,
   });
   cookieStore.set("session", sessionCookie, {
     maxAge: ONE_WEEK,
@@ -98,37 +98,3 @@ export async function isAuthenticated() {
   return !!user; 
 }
 
-export async function getInterviewsByUserId(userId: string): Promise<Interview[] | null>
-{
-  const interviews = await db.collection("interviews").where("userId", "==", userId)
-  .orderBy('createdAt', 'desc')
-  .get();
-
-  return interviews.docs.map((doc) => {
-    return {
-      id: doc.id,
-      ...doc.data(),
-    } as Interview;
-  });
-
-}
-
-export async function getLatestInterviews(params: GetLatestInterviewsParams): Promise<Interview[] | null>
-{
-  const { userId, limit=20} = params;
-  const interviews = await db
-  .collection("interviews")
-  .where('finalized', '==', true)
-  .where("userId", "!=", userId)
-  .orderBy('createdAt', 'desc')
-  .limit(limit)
-  .get();
-
-  return interviews.docs.map((doc) => {
-    return {
-      id: doc.id,
-      ...doc.data(),
-    } as Interview;
-  });
-
-}
