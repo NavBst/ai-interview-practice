@@ -57,6 +57,7 @@ export async function getInterviewById(id: string): Promise<Interview | null> {
 
 export async function createFeedback(params: CreateFeedbackParams) {
   const { interviewId, userId, transcript } = params;
+  console.log(transcript);
   try {
     const formattedTranscript = transcript
       .map(
@@ -66,15 +67,9 @@ export async function createFeedback(params: CreateFeedbackParams) {
       .join("");
 
     const {
-      object: {
-        totalScore,
-        categoryScores,
-        strengths,
-        areasForImprovement,
-        finalAssessment,
-      },
+      object: { totalScore, categoryScores, finalAssessment },
     } = await generateObject({
-      model: google("gemini-1.5-flash"),
+      model: google("gemini-2.5-flash"),
       schema: feedbackSchema,
       prompt: `
         You are an AI interviewer analyzing a mock interview. Your task is to evaluate the candidate based on structured categories. Be thorough and detailed in your analysis. Don't be lenient with the candidate. If there are mistakes or areas for improvement, point them out.
@@ -97,8 +92,6 @@ export async function createFeedback(params: CreateFeedbackParams) {
       userId,
       totalScore,
       categoryScores,
-      strengths,
-      areasForImprovement,
       finalAssessment,
       createdAt: new Date().toISOString(),
     });
