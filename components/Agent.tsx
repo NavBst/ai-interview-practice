@@ -4,10 +4,9 @@ import { createFeedback } from "@/lib/actions/general.action";
 import { cn } from "@/lib/utils";
 import { vapi } from "@/lib/vapi.sdk";
 import { AgentProps } from "@/types";
-import { Call } from "@vapi-ai/web/dist/api";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { use, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 enum CallStatus {
   INACTIVE = "INACTIVE",
@@ -32,11 +31,12 @@ const Agent = ({
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
   const [messages, setMessages] = useState<SavedMessage[]>([]);
+  const feedbackGeneratedRef = useRef(false);
 
   useEffect(() => {
     const onCallStart = () => setCallStatus(CallStatus.ACTIVE);
     const onCallEnd = () => setCallStatus(CallStatus.FINISHED);
-    const onMessage = (message: Message) => {
+    const onMessage = (message: any) => {
       if (message.type === "transcript" && message.transcriptType === "final") {
         const newMessage = { role: message.role, content: message.transcript };
         setMessages((prev) => [...prev, newMessage]);
@@ -44,7 +44,7 @@ const Agent = ({
     };
     const onSpeechStart = () => setIsSpeaking(true);
     const onSpeechEnd = () => setIsSpeaking(false);
-    const onError = (error: Error) => console.log('Error', error);
+    const onError = (error: Error) => console.log("Error", error);
 
     vapi.on("call-start", onCallStart);
     vapi.on("call-end", onCallEnd);
@@ -63,33 +63,40 @@ const Agent = ({
     };
   }, []);
 
-  const handleGenerateFeedback = async (messages: SavedMessage[]) => {
-    console.log("Generate feedback here.");
-    //TODO: create a server action that generates feedback
-    const { success, feedbackId: id } = await createFeedback({
-      interviewId: interviewId!,
-      userId: userId || '',
-      transcript: messages
-    })
+  const handleGenerateFeedback = useCallback(
+    async (messages: SavedMessage[]) => {
+      console.log("Generate feedback here.");
+      //TODO: create a server action that generates feedback
+      const { success, feedbackId: id } = await createFeedback({
+        interviewId: interviewId!,
+        userId: userId || "",
+        transcript: messages,
+      });
 
-    if (success && id) {
-      router.push(`/interview/${interviewId}/feedback`);
-    } else {
-      console.log("Error saving feedback");
-      router.push("/");
-    }
-  };
+      if (success && id) {
+        router.push(`/interview/${interviewId}/feedback`);
+      } else {
+        console.log("Error saving feedback");
+        router.push("/");
+      }
+    },
+    [interviewId, router, userId]
+  );
 
   useEffect(() => {
-    if (callStatus === CallStatus.FINISHED) {
-      console.log(type);
+    if (
+      callStatus === CallStatus.FINISHED &&
+      !feedbackGeneratedRef.current &&
+      userId
+    ) {
+      feedbackGeneratedRef.current = true;
       if (type === "generate") {
         router.push("/");
       } else {
         handleGenerateFeedback(messages);
       }
     }
-  }, [messages, callStatus, type, userId]);
+  }, [messages, callStatus, type, userId, handleGenerateFeedback, router]);
 
   const handleCall = async () => {
     setCallStatus(CallStatus.CONNECTING);
@@ -102,17 +109,17 @@ const Agent = ({
         },
       });
     } else {
-      let formattedQuestions = '';
-      if(questions){
-        formattedQuestions = questions.map((question) => `-${question}`).join('\n');
+      let formattedQuestions = "";
+      if (questions) {
+        formattedQuestions = questions
+          .map((question) => `-${question}`)
+          .join("\n");
       }
-      await vapi.start(interviewer, 
-        {
-          variableValues: {
-            questions: formattedQuestions
-          },
-        }
-      )
+      await vapi.start(interviewer, {
+        variableValues: {
+          questions: formattedQuestions,
+        },
+      });
     }
     console.log("started");
   };

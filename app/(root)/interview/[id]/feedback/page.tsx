@@ -1,23 +1,34 @@
 import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/actions/auth.action";
-import { getFeedbackByInterviewId, getInterviewById } from "@/lib/actions/general.action";
+import {
+  getFeedbackByInterviewId,
+  getInterviewById,
+} from "@/lib/actions/general.action";
 import { RouteParams } from "@/types";
 import dayjs from "dayjs";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-const page = async ({params}: RouteParams) => {
-  const {id} = await params;
+const page = async ({ params }: RouteParams) => {
+  const { id } = await params;
   const user = await getCurrentUser();
 
+  interface AssessmentMetric {
+    name: string;
+    score: number;
+    comment: string;
+  }
+
   const interview = await getInterviewById(id);
-  if(!interview) redirect('/');
+  if (!interview) redirect("/");
 
   const feedback = await getFeedbackByInterviewId({
     interviewId: id,
     userId: user?.id!,
-  })
+  });
+  console.log(feedback);
+  const assessments = feedback?.categoryScores || [];
   return (
     <section className="section-feedback">
       <div className="flex flex-row justify-center">
@@ -57,32 +68,30 @@ const page = async ({params}: RouteParams) => {
 
       <div className="flex flex-col gap-4">
         <h2>Breakdown of the Interview:</h2>
-        {feedback?.categoryScores?.map((category, index) => (
-          <div key={index}>
-            <p className="font-bold">
-              {index + 1}. {category.name} ({category.score}/100)
-            </p>
-            <p>{category.comment}</p>
+
+        <div>
+          <div className="font-normal">
+            {assessments.map((assessment) => {
+              return (
+                <div key={assessment.name} className="mb-8">
+                  <p className="font-bold">{assessment.name}</p>
+                  <p >score: {assessment.score}</p>
+                  <p >{assessment.comment}</p>
+                </div>
+              );
+            })}
           </div>
-        ))}
+        </div>
       </div>
 
       <div className="flex flex-col gap-3">
         <h3>Strengths</h3>
-        <ul>
-          {feedback?.strengths?.map((strength, index) => (
-            <li key={index}>{strength}</li>
-          ))}
-        </ul>
+        <ul>{feedback?.strengths}</ul>
       </div>
 
       <div className="flex flex-col gap-3">
         <h3>Areas for Improvement</h3>
-        <ul>
-          {feedback?.areasForImprovement?.map((area, index) => (
-            <li key={index}>{area}</li>
-          ))}
-        </ul>
+        <ul>{feedback?.areasForImprovement}</ul>
       </div>
 
       <div className="buttons">
